@@ -1,5 +1,6 @@
 import os
 import pickle
+import zipfile
 import streamlit as st
 from streamlit_option_menu import option_menu
 
@@ -8,10 +9,25 @@ st.set_page_config(page_title="Smart Calorie Burn Predictor",
                    layout="wide",
                    page_icon="🔥")
 
+# Extract and load the model
+def load_model():
+    model_zip_path = "calories_model.sav.zip"  # Ensure this file is in the same directory
+    extract_path = "extracted_model"
+
+    # Extract if not already extracted
+    if not os.path.exists(extract_path):
+        with zipfile.ZipFile(model_zip_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_path)
+
+    # Load the extracted .sav file
+    model_path = os.path.join(extract_path, "calories_model.sav")
+    with open(model_path, "rb") as file:
+        model = pickle.load(file)
+
+    return model
+
 # Load the trained model
-model_path = "/Users/pranshugarg/Desktop/calories_model.sav"
-with open(model_path, "rb") as file:
-    calorie_model = pickle.load(file)
+calorie_model = load_model()
 
 # Sidebar navigation
 with st.sidebar:
